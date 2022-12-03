@@ -1,0 +1,33 @@
+name: test
+
+on: [push]
+jobs:
+  test:
+    runs-on: windows-latest
+    steps:
+      # - name: a
+      #   shell: pwsh
+      #   run: get-windowsfeature
+
+      - name: b
+        shell: pwsh
+        run: install-windowsfeature AD-Domain-Services
+
+      - name: c
+        shell: pwsh
+        run: |
+          $SafeModeAdministratorPassword = ConvertTo-SecureString "p4$$w0rd!123" -AsPlainText -Force
+
+          # Import-Module ADDSDeployment
+
+          # Install Active Directory Domain Services
+          Install-ADDSForest -CreateDnsDelegation:$false -DatabasePath "C:\Windows\NTDS" -DomainMode "Win2012R2" -DomainName "example.local" -DomainNetbiosName "YOURDOMAIN" -ForestMode "Win2012R2" -InstallDns:$true -LogPath "C:\Windows\NTDS" -NoRebootOnCompletion:$false -SysvolPath "C:\Windows\SYSVOL" -Force:$true -SafeModeAdministratorPassword $SafeModeAdministratorPassword
+
+      - name: d
+        shell: pwsh
+        run: |
+          systeminfo
+
+          Get-ADDomainController
+
+          Test-ADDSDomainControllerInstallation
